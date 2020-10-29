@@ -4,7 +4,7 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { COURSES } from '../../../../server/db-data';
+import { COURSES, findLessonsForCourse } from '../../../../server/db-data';
 import { Course } from '../model/course';
 import { CoursesService } from './courses.service';
 
@@ -86,6 +86,23 @@ describe('CoursesService', () => {
     req.flush('Save course failed', {
       status: 500,
       statusText: 'Internal Server Error',
+    });
+  });
+
+  it('should find a list of lesson', () => {
+    coursesService.findLessons(12).subscribe((lessons) => {
+      expect(lessons).toBeTruthy();
+      expect(lessons.length).toBe(3);
+    });
+
+    const req = httpTestingController.expectOne(
+      (request) => request.url === '/api/lessons',
+    );
+
+    expect(req.request.method).toEqual('GET');
+    expect(req.request.params.get('courseId')).toEqual('12');
+    req.flush({
+      payload: findLessonsForCourse(12).slice(0, 3),
     });
   });
 

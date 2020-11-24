@@ -7,6 +7,7 @@ import { CoursesModule } from '../courses.module';
 import { CoursesService } from '../services/courses.service';
 import { HomeComponent } from './home.component';
 import { of } from 'rxjs';
+import { click } from '../common/test-utils';
 
 describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
@@ -16,6 +17,10 @@ describe('HomeComponent', () => {
 
   const beginnerCourses = setupCourses().filter(
     (course) => course.category === 'BEGINNER',
+  );
+
+  const advancedCourses = setupCourses().filter(
+    (course) => course.category === 'ADVANCED',
   );
 
   beforeEach(
@@ -50,5 +55,42 @@ describe('HomeComponent', () => {
     const tabs = el.queryAll(By.css('.mat-tab-label'));
 
     expect(tabs.length).toBe(1, 'Unexpected number of tabs found');
+  });
+
+  it('should display only advanced courses', () => {
+    coursesService.findAllCourses.and.returnValue(of(advancedCourses));
+
+    fixture.detectChanges();
+
+    const tabs = el.queryAll(By.css('.mat-tab-label'));
+
+    expect(tabs.length).toBe(1, 'Unexpected number of tabs found');
+  });
+
+  it('should display both tabs', () => {
+    coursesService.findAllCourses.and.returnValue(of(setupCourses()));
+    fixture.detectChanges();
+
+    const tabs = el.queryAll(By.css('.mat-tab-label'));
+
+    expect(tabs.length).toBe(2, 'Expected to find 2 tabs');
+  });
+
+  it('should display advanced courses when tab clicked', () => {
+    coursesService.findAllCourses.and.returnValue(of(setupCourses()));
+    fixture.detectChanges();
+
+    const tabs = el.queryAll(By.css('.mat-tab-label'));
+
+    tabs[1].nativeElement.click();
+
+    fixture.detectChanges();
+
+    const cardTitle = el.queryAll(By.css('.mat-card-title'));
+
+    expect(cardTitle.length).toBeGreaterThan(0, 'Could not find card titles');
+    expect(cardTitle[0].nativeElement.textContent).toContain(
+      'Angular Security Course',
+    );
   });
 });

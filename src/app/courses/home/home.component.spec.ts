@@ -18,7 +18,7 @@ describe('HomeComponent', () => {
 
       TestBed.configureTestingModule({
         imports: [CoursesModule, BrowserAnimationsModule],
-        providers: [CoursesService],
+        providers: [{ provide: CoursesService, useValue: coursesServiceSpy }],
       })
         .compileComponents()
         .then(() => {

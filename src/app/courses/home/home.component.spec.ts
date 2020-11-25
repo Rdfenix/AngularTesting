@@ -1,5 +1,11 @@
 import { DebugElement } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flush,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { By } from '@angular/platform-browser';
 import { setupCourses } from '../common/setup-test-data';
@@ -76,19 +82,23 @@ describe('HomeComponent', () => {
     expect(tabs.length).toBe(2, 'Expected to find 2 tabs');
   });
 
-  it('should display advanced courses when tab clicked', () => {
+  it('should display advanced courses when tab clicked', fakeAsync(() => {
     coursesService.findAllCourses.and.returnValue(of(setupCourses()));
     fixture.detectChanges();
 
     const tabs = el.queryAll(By.css('.mat-tab-label'));
 
-    click(tabs[1]);
+    tabs[1].nativeElement.click();
+    fixture.detectChanges();
+    flush();
 
-    const cardTitle = el.queryAll(By.css('.mat-card-title'));
+    const cardTitles = el.queryAll(
+      By.css('.mat-tab-body-active .mat-card-title'),
+    );
 
-    expect(cardTitle.length).toBeGreaterThan(0, 'Could not find card titles');
-    expect(cardTitle[0].nativeElement.textContent).toContain(
+    expect(cardTitles.length).toBeGreaterThan(0, 'could not find card titles');
+    expect(cardTitles[0].nativeElement.textContent).toContain(
       'Angular Security Course',
     );
-  });
+  }));
 });

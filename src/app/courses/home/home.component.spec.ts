@@ -82,9 +82,7 @@ describe('HomeComponent', () => {
 
     const tabs = el.queryAll(By.css('.mat-tab-label'));
 
-    tabs[1].nativeElement.click();
-
-    fixture.detectChanges();
+    click(tabs[1]);
 
     const cardTitle = el.queryAll(By.css('.mat-card-title'));
 
